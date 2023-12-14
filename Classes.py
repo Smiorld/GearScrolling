@@ -7,6 +7,9 @@ class BaseGear:
         self.clean_price :float = clean_price
         self.tot_slots :int= tot_slots
     
+    def __hash__(self):
+        return hash((self.name, self.category, self.clean_price, self.tot_slots))
+    
 class Gear(BaseGear):
     '''Class that represents a gear, with its name, clean price, total slots and scrolled stats'''
     def __init__(self, name, category, clean_price, tot_slots, scroll_sequence=[], price_ev=0.0, success_rate=1.0, survival_rate=1.0, gear_number_ev=0.0):
@@ -90,6 +93,12 @@ class Scroll:
         self.success_chance :float = success_chance
         self.survival_chance :float = survival_chance
         self.price :float = price
+    def __str__(self) -> str:
+        return f"{self.category} {self.stat} {self.success_chance} {self.price}"
+    
+    def __hash__(self):
+        return hash((self.category, self.stat, self.success_chance, self.survival_chance, self.price))
+        
     
 class Scrolls:
     '''Class that represents a list of scrolls'''
@@ -109,8 +118,11 @@ class Scrolls:
         if tmp_scroll != None:
             tmp_scroll.survival_chance = survival_chance
             tmp_scroll.price = price
+            return True
         else:
-            self.add(category, stat, success_chance, survival_chance, price)
+            if self.add(category, stat, success_chance, survival_chance, price):
+                return True
+        return False
     
     def get(self, category, stat, success_chance):
         '''Returns the scroll with the given category and stat, or None if it doesn't exist'''
@@ -119,7 +131,7 @@ class Scrolls:
                 return scroll
         return None
 
-    def search(self, category='', stat='', success_chance=0.0):
+    def search(self, category='', stat='', success_chance=0.0) -> list[Scroll]:
         '''Returns the list of scrolls that match the given conditions'''
         result = []
         for scroll in self.scrolls:

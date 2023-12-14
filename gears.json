@@ -5,6 +5,12 @@
             "category": "gloves",
             "clean_price": 5,
             "tot_slots": 5
+        },
+        {
+            "name": "redmarker1",
+            "category": "gloves",
+            "clean_price": 2,
+            "tot_slots": 5
         }
     ]
 }

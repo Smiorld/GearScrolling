@@ -1,6 +1,7 @@
 import csv
 from Classes import *
 from Commandline import *
+from termcolor import colored, cprint
 def main():
     # This is the main function of the program. It is called when the program is run.
     # The logic of the program is contained here.
@@ -20,20 +21,20 @@ def main():
         clear_screen()
         basegears.save_to_file()
         scrolls.save_to_file()
-        print(f"Thank you for using, all data has been saved.")
+        cprint(f"Thank you for using, all data has been saved.","green")
         print(f"")
         raise e
     except KeyboardInterrupt as e:
         clear_screen()
         basegears.save_to_file()
         scrolls.save_to_file()
-        print(f"Thank you for using, all data has been saved.")
+        cprint(f"Thank you for using, all data has been saved.","green")
         print(f"")
         raise e
     clear_screen()
     basegears.save_to_file()
     scrolls.save_to_file()
-    print(f"Thank you for using. All data has been saved.")
+    cprint(f"Thank you for using, all data has been saved.","green")
     print(f"")
     print(f"Press enter to exit")
     input()
