@@ -12,7 +12,7 @@ class BaseGear:
     
 class Gear(BaseGear):
     '''Class that represents a gear, with its name, clean price, total slots and scrolled stats'''
-    def __init__(self, name, category, clean_price, tot_slots, scroll_sequence=[], price_ev=0.0, success_rate=1.0, survival_rate=1.0, gear_number_ev=0.0):
+    def __init__(self, name, category, clean_price, tot_slots, scroll_sequence=[], price_ev=0.0, success_rate=1.0, survival_rate=1.0, gear_number_ev=1.0):
         super().__init__(name, category, clean_price, tot_slots)
         self.scroll_sequence :list[Scroll] = scroll_sequence
         self.price_ev :float = clean_price if price_ev == 0.0 else price_ev
@@ -40,7 +40,10 @@ class BaseGears:
             return False
         if self.get(name) == None:
             self.gears.append(BaseGear(name, category, clean_price, tot_slots))
-        return True
+            self.save_to_file()
+            return True
+        else:
+            return False
         
         
     def update(self, name, category, clean_price, tot_slots):
@@ -49,6 +52,7 @@ class BaseGears:
         if tmp_gear != None:
             tmp_gear.clean_price = clean_price
             tmp_gear.tot_slots = tot_slots
+            self.save_to_file()
             return True
         else:
             if self.add(name, category, clean_price, tot_slots):
@@ -63,6 +67,11 @@ class BaseGears:
             if gear.name.find(name) != -1 and gear.category.find(category) != -1:
                 result.append(gear)
         return result
+    
+    def remove(self, gear: BaseGear):
+        '''Remove the given gear from data'''
+        self.gears.remove(gear)
+        self.save_to_file()
     
     def load_from_file(self, file_name='gears.json'):
         '''Loads the gears from the given file'''
@@ -95,6 +104,8 @@ class Scroll:
         self.price :float = price
     def __str__(self) -> str:
         return f"{self.category} {self.stat} {self.success_chance} {self.price}"
+    def __repr__(self) -> str:
+        return f"{self.category} {self.stat} {self.success_chance} {self.price}"
     
     def __hash__(self):
         return hash((self.category, self.stat, self.success_chance, self.survival_chance, self.price))
@@ -107,8 +118,11 @@ class Scrolls:
     
     def add(self, category, stat, success_chance, survival_chance, price):
         '''Adds a new scroll to the list, returns True if added successfully, False if it already existed'''
+        if category=='' or stat=='' or success_chance==0.0:
+            return False
         if self.get(category, stat, success_chance) == None:
             self.scrolls.append(Scroll(category, stat, success_chance, survival_chance, price))
+            self.save_to_file()
             return True
         return False
         
@@ -118,11 +132,12 @@ class Scrolls:
         if tmp_scroll != None:
             tmp_scroll.survival_chance = survival_chance
             tmp_scroll.price = price
+            self.save_to_file()
             return True
         else:
             if self.add(category, stat, success_chance, survival_chance, price):
                 return True
-        return False
+            return False
     
     def get(self, category, stat, success_chance):
         '''Returns the scroll with the given category and stat, or None if it doesn't exist'''
@@ -142,6 +157,12 @@ class Scrolls:
                 if scroll.category.find(category) != -1 and scroll.stat.find(stat) != -1 and scroll.success_chance == success_chance:
                     result.append(scroll)
         return result
+    
+    def remove(self, scroll: Scroll):
+        '''Remove the given scroll from data'''
+        self.scrolls.remove(scroll)
+        self.save_to_file()
+    
     def load_from_file(self, file_name='scrolls.json'):
         '''Loads the scrolls from the given file'''
         # if no such file exists, return

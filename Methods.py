@@ -25,29 +25,35 @@ def sequence_scroll(scroll_sequence: tuple[Scroll], gear: BaseGear):
         one_step_scroll(scroll, tmp_gear)
     return True, tmp_gear
 
-def output_scroll_sequence(scroll_sequence: tuple[Scroll], gear: BaseGear):
+def output_scroll_sequence(scroll_sequence: tuple[Scroll], gear: BaseGear, filename:str = 'output.csv'):
     '''Outputs the result to csv of scrolling the gear with the given sequence of scrolls'''
-    with open('output.csv', 'w', newline='') as csvfile:
-        writer = csv.writer(csvfile)
-        writer.writerow(['','gear name', 'category', 'scroll stat', 'clean price', 'total slots'])
-        writer.writerow(['gear',gear.name, gear.category, scroll_sequence[0].stat, gear.clean_price, gear.tot_slots])
-        writer.writerow(['scroll type', '10p', '30p', '60p', '70p'])
-        scroll_10p = scrolls.get(gear.category, scroll_sequence[0].stat, 0.1)
-        scroll_30p = scrolls.get(gear.category, scroll_sequence[0].stat, 0.3)
-        scroll_60p = scrolls.get(gear.category, scroll_sequence[0].stat, 0.6)
-        scroll_70p = scrolls.get(gear.category, scroll_sequence[0].stat, 0.7)
-        price_10p = scroll_10p.price if scroll_10p is not None else 'no data'
-        price_30p = scroll_30p.price if scroll_30p is not None else 'no data'
-        price_60p = scroll_60p.price if scroll_60p is not None else 'no data'
-        price_70p = scroll_70p.price if scroll_70p is not None else 'no data'
-        writer.writerow(['scroll price', price_10p, price_30p, price_60p, price_70p])
-        
-        writer.writerow(['Slots\\columns', 'production cost', 'pass rate', 'survival rate', 'gears usage'])
-        tmp_gear = Gear(gear.name, gear.category, gear.clean_price, gear.tot_slots)
-        for index, scroll in enumerate(scroll_sequence):
-            one_step_scroll(scroll, tmp_gear)
-            writer.writerow([index+1, tmp_gear.price_ev, tmp_gear.success_rate, tmp_gear.survival_rate, tmp_gear.gear_number_ev])
-    return
+    while True:
+        try:
+            with open(filename, 'w', newline='') as csvfile:
+                writer = csv.writer(csvfile)
+                writer.writerow(['','gear name', 'category', 'scroll stat', 'clean price', 'total slots'])
+                writer.writerow(['gear',gear.name, gear.category, scroll_sequence[0].stat, gear.clean_price, gear.tot_slots])
+                writer.writerow([])
+                writer.writerow(['scroll type', '10%', '30%', '60%', '70%'])
+                scroll_10p = scrolls.get(gear.category, scroll_sequence[0].stat, 0.1)
+                scroll_30p = scrolls.get(gear.category, scroll_sequence[0].stat, 0.3)
+                scroll_60p = scrolls.get(gear.category, scroll_sequence[0].stat, 0.6)
+                scroll_70p = scrolls.get(gear.category, scroll_sequence[0].stat, 0.7)
+                price_10p = scroll_10p.price if scroll_10p is not None else 'no data'
+                price_30p = scroll_30p.price if scroll_30p is not None else 'no data'
+                price_60p = scroll_60p.price if scroll_60p is not None else 'no data'
+                price_70p = scroll_70p.price if scroll_70p is not None else 'no data'
+                writer.writerow(['scroll price', price_10p, price_30p, price_60p, price_70p])
+                writer.writerow([])
+                writer.writerow(['Slots\\columns','scrolls', 'production cost', 'pass rate', 'survival rate', 'gears usage'])
+                tmp_gear = Gear(gear.name, gear.category, gear.clean_price, gear.tot_slots)
+                for index, scroll in enumerate(scroll_sequence):
+                    one_step_scroll(scroll, tmp_gear)
+                    writer.writerow([index+1, scroll.success_chance, tmp_gear.price_ev, tmp_gear.success_rate, tmp_gear.survival_rate, tmp_gear.gear_number_ev])
+            return filename
+        except PermissionError as e:
+            input(f"Please close the file {filename} and press enter to continue")
+            continue
 
 def find_best_order(scroll_sequence: tuple[Scroll], gear: BaseGear):
     '''Finds the best order of given scrolls for the gear'''
