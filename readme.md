@@ -14,10 +14,10 @@ It is used to calculate the best scrolling sequence to lower the gear making cos
 
 # Functionalities
 
-[x] manage scrolls data
-[x] manage gears data
-[] update scrolls data from owlrepo
-[] generate output besed on a given scrolling sequence and gear
-[] save/load scrolling sequences to/from file
-[] generate the best order for given sequence
-[] generate the best ordered sequence for given expected 10%/30% success number and 60%/70% success number 
+- [x] manage scrolls data
+- [x] manage gears data
+- [ ] update scrolls data from owlrepo
+- [ ] generate output besed on a given scrolling sequence and gear
+- [ ] save/load scrolling sequences to/from file
+- [ ] generate the best order for given sequence
+- [ ] generate the best ordered sequence for given expected 10%/30% success number and 60%/70% success number 
