@@ -1,0 +1,10 @@
+{
+    "gears": [
+        {
+            "name": "redmarker2",
+            "category": "gloves",
+            "clean_price": 5,
+            "tot_slots": 5
+        }
+    ]
+}
