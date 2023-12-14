@@ -1,5 +1,6 @@
 # Intro
 This repository contains a command-line tool for Maplelegends. 
+
 It is used to calculate the best scrolling sequence to lower the gear making cost.
 
 # How to use
