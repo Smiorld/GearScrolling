@@ -1,6 +1,6 @@
 bo
 redmarker2
-magic
+m.att
 70
 30
 70

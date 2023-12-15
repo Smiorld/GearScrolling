@@ -35,16 +35,18 @@ def output_scroll_sequence(scroll_sequence: tuple[Scroll], gear: BaseGear, filen
                 writer.writerow(['','gear name', 'category', 'scroll stat', 'clean price', 'total slots'])
                 writer.writerow(['gear',gear.name, gear.category, scroll_sequence[0].stat, gear.clean_price, gear.tot_slots])
                 writer.writerow([])
-                writer.writerow(['scroll type', '10%', '30%', '60%', '70%'])
+                writer.writerow(['scroll type', '10%', '30%', '60%', '70%', '100%'])
                 scroll_10p = scrolls.get(gear.category, scroll_sequence[0].stat, 0.1)
                 scroll_30p = scrolls.get(gear.category, scroll_sequence[0].stat, 0.3)
                 scroll_60p = scrolls.get(gear.category, scroll_sequence[0].stat, 0.6)
                 scroll_70p = scrolls.get(gear.category, scroll_sequence[0].stat, 0.7)
+                scroll_100p = scrolls.get(gear.category, scroll_sequence[0].stat, 1)
                 price_10p = scroll_10p.price if scroll_10p is not None else 'no data'
                 price_30p = scroll_30p.price if scroll_30p is not None else 'no data'
                 price_60p = scroll_60p.price if scroll_60p is not None else 'no data'
                 price_70p = scroll_70p.price if scroll_70p is not None else 'no data'
-                writer.writerow(['scroll price', price_10p, price_30p, price_60p, price_70p])
+                price_100p = scroll_100p.price if scroll_100p is not None else 'no data'
+                writer.writerow(['scroll price', price_10p, price_30p, price_60p, price_70p, price_100p])
                 writer.writerow([])
                 writer.writerow(['Slots\\columns','scrolls', 'cost EV', 'pass rate', 'survival rate', 'gears usage'])
                 tmp_gear = Gear(gear.name, gear.category, gear.clean_price, gear.tot_slots)
@@ -139,3 +141,7 @@ def generate_sequences_form_statresult(statresult:list[int], gear: BaseGear, sta
                 scroll_sequence.append(scroll_70p)
             scroll_sequences.append(tuple(scroll_sequence)) 
     return True, scroll_sequences
+
+
+        
+   

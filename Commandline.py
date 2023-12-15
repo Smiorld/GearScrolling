@@ -63,6 +63,8 @@ def parse_cmd_input(input:str):
             deal_bestorder()
         elif words[0]=='bestsequence' or words[0]=='bs':
             deal_bestsequence()
+        elif words[0]=='updateowlrepo' or words[0]=='uo':
+            deal_updateowlrepo()
     clear_screen()
     ready_to_output += '\n'
     ready_to_output += f"Last Command: {colored(input,'blue')}"
@@ -76,6 +78,14 @@ def deal_home_help(words:list[str]):
     ready_to_output += "e.g. " + colored("SearchGear","yellow") + ", " + colored("searchgear","yellow") + " and "+colored("sg","yellow")+" works the same.\n"
     ready_to_output += "And "+colored("xxx=","yellow")+" can be ignored, e.g. "+colored("SearchGear name=abc","yellow")+" and "+colored("SearchGear abc","yellow")+" works the same.\n"
     ready_to_output += "\n"
+    ready_to_output += "\n"
+    ready_to_output += colored("QuickCommand ","yellow")+"filename=[filename]: load and excute commands from a file\n"
+    ready_to_output += "\n"
+    ready_to_output += colored("SingleAnalyse ","red")+" : tool - generate analysis besed on a single scrolling sequence and gear\n"
+    ready_to_output += "\n"
+    ready_to_output += colored("BestOrder ","red")+": tool - generate the best order of the given scrolls list and gear\n"
+    ready_to_output += "\n"
+    ready_to_output += colored("BestSequence","red")+": tool - generate the best sequence based on aimed stats result\n"
     ready_to_output += "\n"
     ready_to_output += colored("Help","yellow")+": show this help message\n"
     ready_to_output += "\n"
@@ -93,13 +103,7 @@ def deal_home_help(words:list[str]):
     ready_to_output += "\n"
     ready_to_output += colored("RemoveScroll ","yellow")+"category=[category] stat=[stat] success_chance=[success_chance]: remove a specific scroll with the given condition\n"
     ready_to_output += "\n"
-    ready_to_output += colored("QuickCommand ","yellow")+"filename=[filename]: load and excute commands from a file (only red command supported)\n"
-    ready_to_output += "\n"
-    ready_to_output += colored("SingleAnalyse ","red")+" : tool - generate analysis besed on a single scrolling sequence and gear\n"
-    ready_to_output += "\n"
-    ready_to_output += colored("BestOrder ","red")+": tool - generate the best order of the given scrolls list and gear\n"
-    ready_to_output += "\n"
-    ready_to_output += colored("BestSequence","red")+": tool - generate the best sequence based on aimed stats result\n"
+    ready_to_output += colored("UpdateOwlrepo","yellow")+": update the saved owlrepo seached results from internet.\n"
     
 def deal_searchgear(words:list[str]):
     global cmd_status, ready_to_output, basegears
@@ -134,34 +138,37 @@ def deal_searchgear(words:list[str]):
 
 def deal_addgear(words:list[str]):
     global cmd_status, ready_to_output, basegears
-    gear={'name':'', 'category':'', 'clean_price':0.0, 'tot_slots':0}
-    exist_equal = False
-    for word in words:
-        if word.startswith('name='):
-            exist_equal = True
-            gear['name'] = word[5:]
-        elif word.startswith('category='):
-            exist_equal = True
-            gear['category'] = word[9:]
-        elif word.startswith('clean_price='):
-            exist_equal = True
-            gear['clean_price'] = float(word[12:])
-        elif word.startswith('tot_slots='):
-            exist_equal = True
-            gear['tot_slots'] = int(word[10:])
-    if not exist_equal:
-        if 0<len(words):
-            gear['name'] = words[0]
-        if 1<len(words):
-            gear['category'] = words[1]
-        if 2<len(words):
-            gear['clean_price'] = int(words[2])
-        if 3<len(words):
-            gear['tot_slots'] = int(words[3])
-    if basegears.update(gear['name'], gear['category'], gear['clean_price'], gear['tot_slots']):
-        ready_to_output += f"Gear {gear['name']} updated and saved successfully.\n"
-    else:
-        ready_to_output += f"Input not valid, please make sure both name and category are not empty.\n"
+    try:
+        gear={'name':'', 'category':'', 'clean_price':0.0, 'tot_slots':0}
+        exist_equal = False
+        for word in words:
+            if word.startswith('name='):
+                exist_equal = True
+                gear['name'] = word[5:]
+            elif word.startswith('category='):
+                exist_equal = True
+                gear['category'] = word[9:]
+            elif word.startswith('clean_price='):
+                exist_equal = True
+                gear['clean_price'] = float(word[12:])
+            elif word.startswith('tot_slots='):
+                exist_equal = True
+                gear['tot_slots'] = int(word[10:])
+        if not exist_equal:
+            if 0<len(words):
+                gear['name'] = words[0]
+            if 1<len(words):
+                gear['category'] = words[1]
+            if 2<len(words):
+                gear['clean_price'] = float(words[2])
+            if 3<len(words):
+                gear['tot_slots'] = int(words[3])
+        if basegears.update(gear['name'], gear['category'], gear['clean_price'], gear['tot_slots']):
+            ready_to_output += f"Gear {gear['name']} updated and saved successfully.\n"
+        else:
+            ready_to_output += f"Input not valid, please make sure both name and category are not empty.\n"
+    except ValueError:
+        ready_to_output += f"Input not valid, please make sure clean_price and tot_slots are numbers.\n"
     return
 
 def deal_removegear(words:list[str]):
@@ -222,68 +229,73 @@ def deal_searchscroll(words:list[str]):
 
 def deal_addscroll(words:list[str]):
     global cmd_status, ready_to_output, scrolls
-    scroll={'category':'', 'stat':'', 'success_chance':0.0, 'price':0.0, 'survival_chance':0.0 }
-    exist_equal = False
-    for word in words:
-        if word.startswith('category='):
-            exist_equal = True
-            scroll['category'] = word[9:]
-        elif word.startswith('stat='):
-            exist_equal = True
-            scroll['stat'] = word[5:]
-        elif word.startswith('success_chance='):
-            exist_equal = True
-            tmp_success_chance = float(word[15:])
-            if tmp_success_chance <= 1:
-                scroll['success_chance'] = tmp_success_chance
+    try:
+        scroll={'category':'', 'stat':'', 'success_chance':0.0, 'price':0.0, 'survival_chance':0.0 }
+        exist_equal = False
+        for word in words:
+            if word.startswith('category='):
+                exist_equal = True
+                scroll['category'] = word[9:]
+            elif word.startswith('stat='):
+                exist_equal = True
+                scroll['stat'] = word[5:]
+            elif word.startswith('success_chance='):
+                exist_equal = True
+                tmp_success_chance = float(word[15:])
+                if tmp_success_chance <= 1:
+                    scroll['success_chance'] = tmp_success_chance
+                else:
+                    scroll['success_chance'] = tmp_success_chance/100
+            elif word.startswith('price='):
+                exist_equal = True
+                scroll['price'] = float(word[6:])
+            elif word.startswith('survival_chance='):
+                exist_equal = True
+                tmp_survival_chance = float(word[16:])
+                if tmp_survival_chance <= 1:
+                    scroll['survival_chance'] = tmp_survival_chance
+                else:
+                    scroll['survival_chance'] = tmp_survival_chance/100
+            
+        if not exist_equal:
+            if 0<len(words):
+                scroll['category'] = words[0]
+            if 1<len(words):
+                scroll['stat'] = words[1]
+            if 2<len(words):
+                tmp_success_chance = float(words[2])
+                if tmp_success_chance <= 1:
+                    scroll['success_chance'] = tmp_success_chance
+                else:
+                    scroll['success_chance'] = tmp_success_chance/100
+            if 3<len(words):
+                scroll['price'] = float(words[3])
+            if 4<len(words):
+                tmp_survival_chance = float(words[4])
+                if tmp_survival_chance <= 1:
+                    scroll['survival_chance'] = tmp_survival_chance
+                else:
+                    scroll['survival_chance'] = tmp_survival_chance/100
+        if scroll['survival_chance'] == 0:
+            if scroll['success_chance'] == 0.1:
+                scroll['survival_chance'] = 1
+            elif scroll['success_chance'] == 0.3:
+                scroll['survival_chance'] = 0.65
+            elif scroll['success_chance'] == 0.6:
+                scroll['survival_chance'] = 1
+            elif scroll['success_chance'] == 0.7:
+                scroll['survival_chance'] = 0.85
+            elif scroll['success_chance'] == 1:
+                scroll['survival_chance'] = 1
             else:
-                scroll['success_chance'] = tmp_success_chance/100
-        elif word.startswith('price='):
-            exist_equal = True
-            scroll['price'] = float(word[6:])
-        elif word.startswith('survival_chance='):
-            exist_equal = True
-            tmp_survival_chance = float(word[16:])
-            if tmp_survival_chance <= 1:
-                scroll['survival_chance'] = tmp_survival_chance
-            else:
-                scroll['survival_chance'] = tmp_survival_chance/100
+                scroll['survival_chance'] = 1
         
-    if not exist_equal:
-        if 0<len(words):
-            scroll['category'] = words[0]
-        if 1<len(words):
-            scroll['stat'] = words[1]
-        if 2<len(words):
-            tmp_success_chance = float(words[2])
-            if tmp_success_chance <= 1:
-                scroll['success_chance'] = tmp_success_chance
-            else:
-                scroll['success_chance'] = tmp_success_chance/100
-        if 3<len(words):
-            scroll['price'] = float(words[3])
-        if 4<len(words):
-            tmp_survival_chance = float(words[4])
-            if tmp_survival_chance <= 1:
-                scroll['survival_chance'] = tmp_survival_chance
-            else:
-                scroll['survival_chance'] = tmp_survival_chance/100
-    if scroll['survival_chance'] == 0:
-        if scroll['success_chance'] == 0.1:
-            scroll['survival_chance'] = 1
-        elif scroll['success_chance'] == 0.3:
-            scroll['survival_chance'] = 0.65
-        elif scroll['success_chance'] == 0.6:
-            scroll['survival_chance'] = 1
-        elif scroll['success_chance'] == 0.7:
-            scroll['survival_chance'] = 0.85
-        elif scroll['success_chance'] == 1:
-            scroll['survival_chance'] = 1
-    
-    if scrolls.update(scroll['category'], scroll['stat'], scroll['success_chance'], scroll['survival_chance'], scroll['price']):
-        ready_to_output += f"Scroll {scroll} updated and saved successfully.\n"
-    else:
-        ready_to_output += f"Input not valid, please make sure category, stat, success_chance are not empty.\n"
+        if scrolls.update(scroll['category'], scroll['stat'], scroll['success_chance'], scroll['survival_chance'], scroll['price']):
+            ready_to_output += f"Scroll {scroll} updated and saved successfully.\n"
+        else:
+            ready_to_output += f"Input not valid, please make sure category, stat, success_chance are not empty.\n"
+    except ValueError:
+        ready_to_output += f"Input not valid, please make sure success_chance, survival_chance and price are valid numbers.\n"
     return
 
 def deal_removescroll(words:list[str]):
@@ -320,6 +332,14 @@ def deal_removescroll(words:list[str]):
         ready_to_output += f"Scroll {scroll} removed successfully.\n"
     else:
         ready_to_output += f"Input not valid, please make sure there is a scroll named '{scroll['category']} {scroll['stat']} {scroll['success_chance']}'\n"
+    return
+
+def deal_updateowlrepo():
+    global cmd_status, ready_to_output
+    if OwlrepoScrollsCategory.download_from_owlrepo() and OwlrepoSearchItemIndex.download_from_owlrepo():
+        ready_to_output += f"Update Owlrepo saved data successfully.\n"
+    else:
+        ready_to_output += f"Update Owlrepo saved data failed, check your internet or contact to T2Julius as a bug.\n"
     return
 
 # quick command

@@ -9,6 +9,7 @@ from termcolor import colored, cprint
 # 3. Execute command and return result (either through cmd print or through file write)
 # 4. Repeat 2-3 until user exits
 def main():
+    load_owlrepo_data()
     clear_screen()
     try:
         while True:
@@ -38,6 +39,12 @@ def main():
     print(f"")
     print(f"Press enter to exit")
     input()
+    
+def load_owlrepo_data():
+    '''Updates the data from owlrepo'''
+    if OwlrepoScrollsCategory.load_from_file() and OwlrepoSearchItemIndex.load_from_file():
+        return True
+    return False
 if __name__ == '__main__':
     main()
 
