@@ -2,13 +2,13 @@ import csv
 from Classes import *
 from Commandline import *
 from termcolor import colored, cprint
+# This is the main function of the program. It is called when the program is run.
+# The logic of the program is contained here.
+# 1. Read data from files
+# 2. Enter command line interface, waiting user input
+# 3. Execute command and return result (either through cmd print or through file write)
+# 4. Repeat 2-3 until user exits
 def main():
-    # This is the main function of the program. It is called when the program is run.
-    # The logic of the program is contained here.
-    # 1. Read data from files
-    # 2. Enter command line interface, waiting user input
-    # 3. Execute command and return result (either through cmd print or through file write)
-    # 4. Repeat 2-3 until user exits
     clear_screen()
     try:
         while True:
@@ -38,8 +38,6 @@ def main():
     print(f"")
     print(f"Press enter to exit")
     input()
-    return
-
-
 if __name__ == '__main__':
     main()
+

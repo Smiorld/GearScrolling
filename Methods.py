@@ -3,6 +3,7 @@ from functools import lru_cache
 from typing import Union
 import csv, copy
 from itertools import permutations
+
 basegears = BaseGears()
 basegears.load_from_file()
 scrolls = Scrolls()

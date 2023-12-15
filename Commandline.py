@@ -1,4 +1,3 @@
-# TODO: print some color. structure current output pannels. add more commands.
 from Classes import BaseGears, Scrolls, Gear
 from Methods import *
 import csv, os, builtins
@@ -66,7 +65,7 @@ def parse_cmd_input(input:str):
             deal_bestsequence()
     clear_screen()
     ready_to_output += '\n'
-    ready_to_output += f"Last Command: {colored(input,"blue")}"
+    ready_to_output += f"Last Command: {colored(input,'blue')}"
     
 # home page commands
         
@@ -435,17 +434,17 @@ def deal_singleanalyse():
     scroll_sequence = tuple(scroll_sequence)
     filename = output_scroll_sequence(scroll_sequence, basegear) # type: ignore
     ready_to_output += f"QuickCommand:\n"
-    ready_to_output += f"{colored("sa","red")}\n"
-    ready_to_output += f"{colored(basegear.name,"red")}\n"
-    ready_to_output += f"{colored(stat,"red")}\n"
+    ready_to_output += f"{colored('sa','red')}\n"
+    ready_to_output += f"{colored(basegear.name,'red')}\n"
+    ready_to_output += f"{colored(stat,'red')}\n"
     for scroll in scroll_sequence:
-        ready_to_output += f"{colored(scroll.success_chance,"red")}\n"
+        ready_to_output += f"{colored(scroll.success_chance,'red')}\n"
     ready_to_output += f"\n"
     ready_to_output += f"\n"
     ready_to_output += f"-----\n"
     ready_to_output += f"you can copy above QuickCommand (red text) to a .txt file and use QuickCommand in home page to excute it.\n"
     
-    ready_to_output += f"result has been output to {colored(filename,"cyan")}\n"
+    ready_to_output += f"result has been output to {colored(filename,'cyan')}\n"
     
 def deal_bestorder():
     global cmd_status, ready_to_output, scrolls, basegears
@@ -503,16 +502,16 @@ def deal_bestorder():
         return
     filename = output_scroll_sequence(result[0], basegear) # type: ignore
     ready_to_output += f"QuickCommand:\n"
-    ready_to_output += f"{colored("bo","red")}\n"
-    ready_to_output += f"{colored(basegear.name,"red")}\n"
-    ready_to_output += f"{colored(stat,"red")}\n"
+    ready_to_output += f"{colored('bo','red')}\n"
+    ready_to_output += f"{colored(basegear.name,'red')}\n"
+    ready_to_output += f"{colored(stat,'red')}\n"
     for scroll in scroll_sequence: 
-        ready_to_output += f"{colored(scroll.success_chance,"red")}\n" 
+        ready_to_output += f"{colored(scroll.success_chance,'red')}\n" 
     ready_to_output += f"\n"
     ready_to_output += f"\n"
     ready_to_output += f"-----\n"
     ready_to_output += f"you can copy above QuickCommand (red text) to a .txt file and use QuickCommand in home page to excute it.\n"
-    ready_to_output += f"best order result has been output to {colored(filename,"cyan")}\n"
+    ready_to_output += f"best order result has been output to {colored(filename,'cyan')}\n"
     
 def deal_bestsequence():
     global cmd_status, ready_to_output, scrolls, basegears
@@ -571,16 +570,16 @@ def deal_bestsequence():
         return
     filename = output_scroll_sequence(result, basegear) # type: ignore
     ready_to_output += f"QuickCommand:\n"
-    ready_to_output += f"{colored("bs","red")}\n"
-    ready_to_output += f"{colored(basegear.name,"red")}\n"
-    ready_to_output += f"{colored(stat,"red")}\n"
-    ready_to_output += f"{colored(statresult[0],"red")}\n"
-    ready_to_output += f"{colored(statresult[1],"red")}\n"
+    ready_to_output += f"{colored('bs','red')}\n"
+    ready_to_output += f"{colored(basegear.name,'red')}\n"
+    ready_to_output += f"{colored(stat,'red')}\n"
+    ready_to_output += f"{colored(statresult[0],'red')}\n"
+    ready_to_output += f"{colored(statresult[1],'red')}\n"
     ready_to_output += f"\n"
     ready_to_output += f"\n"
     ready_to_output += f"-----\n"
     ready_to_output += f"you can copy above QuickCommand (red text) to a .txt file and use QuickCommand in home page to excute it.\n"
-    ready_to_output += f"best sequence result has been output to {colored(filename,"cyan")}\n"
+    ready_to_output += f"best sequence result has been output to {colored(filename,'cyan')}\n"
     
     
 
