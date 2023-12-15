@@ -4,6 +4,7 @@ from Methods import *
 import csv, os, builtins
 from termcolor import colored, cprint
 
+DEBUG = False
 cmd_status = 0  
 ready_to_output = ''
 status_dict ={
@@ -60,8 +61,9 @@ def parse_cmd_input(input:str):
         elif words[0]=='singleanalyse' or words[0]=='sa':
             deal_singleanalyse()
         elif words[0]=='bestorder' or words[0]=='bo':
-            #deal_bestorder(words[1:])
-            pass
+            deal_bestorder()
+        elif words[0]=='bestsequence' or words[0]=='bs':
+            deal_bestsequence()
     clear_screen()
     ready_to_output += '\n'
     ready_to_output += f"Last Command: {colored(input,"blue")}"
@@ -97,6 +99,8 @@ def deal_home_help(words:list[str]):
     ready_to_output += colored("SingleAnalyse ","red")+" : tool - generate analysis besed on a single scrolling sequence and gear\n"
     ready_to_output += "\n"
     ready_to_output += colored("BestOrder ","red")+": tool - generate the best order of the given scrolls list and gear\n"
+    ready_to_output += "\n"
+    ready_to_output += colored("BestSequence","red")+": tool - generate the best sequence based on aimed stats result\n"
     
 def deal_searchgear(words:list[str]):
     global cmd_status, ready_to_output, basegears
@@ -342,6 +346,8 @@ def deal_quickcommand(words:list[str]):
         ready_to_output += f"Input not valid, please make sure there is a file named '{filename}'.\n"
         return
     except Exception as e:
+        if DEBUG:
+            raise e
         ready_to_output += f"Input not valid, please check the file '{filename}'.\n"
         return
     return
@@ -382,8 +388,8 @@ def execute_with_file_input(commands_file_path):
 def deal_singleanalyse():
     global cmd_status, ready_to_output, scrolls, basegears
     # the process as follow:
-    # 1. get gear info. use gears.get() to get the gear, if not exist, back to single analse page.
-    # 2. get stat, then use scrolls.search() to get the scroll list, if not exist, back to single analse page.
+    # 1. get gear info. use gears.get() to get the gear, if not exist, return.
+    # 2. get stat, then use scrolls.search() to get the scroll list, if not exist, return.
     # 3. repeatedly asking to select scroll to fill in a list[scroll] as the scroll sequence. waiting for empty input to stop.
     # 4. use scroll sequence and gear to calculate the result.
     # 5. output the result.
@@ -407,7 +413,7 @@ def deal_singleanalyse():
     while True:
         clear_screen()
         for index, scroll in enumerate(scroll_list):
-            print(f"{index}:{scroll}")
+            print(f"{index} : {scroll}")
         print("")
         print(f"Current scroll sequence: {scroll_sequence}\n")
         print(f"Please input scroll chance to specify which scroll to add. Press enter without anything to exit: ")
@@ -435,8 +441,147 @@ def deal_singleanalyse():
     for scroll in scroll_sequence:
         ready_to_output += f"{colored(scroll.success_chance,"red")}\n"
     ready_to_output += f"\n"
+    ready_to_output += f"\n"
+    ready_to_output += f"-----\n"
     ready_to_output += f"you can copy above QuickCommand (red text) to a .txt file and use QuickCommand in home page to excute it.\n"
     
     ready_to_output += f"result has been output to {colored(filename,"cyan")}\n"
     
+def deal_bestorder():
+    global cmd_status, ready_to_output, scrolls, basegears
+    # the process as follow:
+    # 1. get gear info. use gears.get() to get the gear, if not exist, return.
+    # 2. get stat, then use scrolls.search() to get the scroll list, if not exist, back to single analse page.
+    # 3. repeatedly asking to select scroll to fill in a list[scroll] as the scroll list. waiting for empty input to stop.
+    # 4. generate all possible orders and put each sequence into simu and save the best result among them.
+    # 5. output the result.
+    clear_screen()
+    text = input("please input the exact gear name (no space): ")
+    basegear = basegears.get(text.strip().lower())
+    if basegear is None:
+        ready_to_output += f"Gear named '{text.strip().lower()}' not found, please check your gear data.\n"
+        return
+    # get stat
+    clear_screen()
+    text = input("please input the exact stat name: ")
+    stat = text.strip().lower()
+    # get scroll list
+    scroll_list = scrolls.search(basegear.category, stat)
+    if len(scroll_list) == 0:
+        ready_to_output += f"Scroll for {basegear.category} {stat} not found, please check your scroll data.\n"
+        return
+    # get scroll sequence. into a loop, waiting for empty input to stop.
+    scroll_sequence = []
+    while True:
+        clear_screen()
+        for index, scroll in enumerate(scroll_list):
+            print(f"{index} : {scroll}")
+        print("")
+        print(f"Current scroll sequence: {scroll_sequence}\n")
+        print(f"Please input scroll chance to specify which scroll to add. Press enter without anything to exit: ")
+        text = input().lower().strip()
+        if len(text)== 0:
+            break
+        try:
+            text=float(text)
+        except ValueError:
+            continue
+        if text >1:
+            text = text/100
+        tmp_scroll = scrolls.get(basegear.category, stat, float(text))
+        if tmp_scroll is None:
+            continue
+        scroll_sequence.append(tmp_scroll) 
+    
+    # validate scroll sequence
+    if len(scroll_sequence) > basegear.tot_slots:
+        ready_to_output += f"Scrolls more than max slots of the gear, please check your scroll sequence.\n"
+        return
+    success, result = find_best_order(tuple(scroll_sequence), basegear) # type: ignore
+    if not success and type(result)==str:
+        ready_to_output += result+"\n"
+        return
+    filename = output_scroll_sequence(result[0], basegear) # type: ignore
+    ready_to_output += f"QuickCommand:\n"
+    ready_to_output += f"{colored("bo","red")}\n"
+    ready_to_output += f"{colored(basegear.name,"red")}\n"
+    ready_to_output += f"{colored(stat,"red")}\n"
+    for scroll in scroll_sequence: 
+        ready_to_output += f"{colored(scroll.success_chance,"red")}\n" 
+    ready_to_output += f"\n"
+    ready_to_output += f"\n"
+    ready_to_output += f"-----\n"
+    ready_to_output += f"you can copy above QuickCommand (red text) to a .txt file and use QuickCommand in home page to excute it.\n"
+    ready_to_output += f"best order result has been output to {colored(filename,"cyan")}\n"
+    
+def deal_bestsequence():
+    global cmd_status, ready_to_output, scrolls, basegears
+    # the process as follow:
+    # 1. get gear info. use gears.get() to get the gear, if not exist, return.
+    # 2. get stat, then use scrolls.search() to get the scroll list, if not exist, return.
+    # 3. display all available scrolls, ask user to input 10%+30% success number and 60%+70% success number.
+    # 4. call generate_sequences_form_statresult() to get the best sequence.
+    # 5. output the result.
+    clear_screen()
+    text = input("please input the exact gear name (no space): ")
+    basegear = basegears.get(text.strip().lower())
+    if basegear is None:
+        ready_to_output += f"Gear named '{text.strip().lower()}' not found, please check your gear data.\n"
+        return
+    # get stat
+    clear_screen()
+    text = input("please input the exact stat name: ")
+    stat = text.strip().lower()
+    # get scroll list
+    scroll_list = scrolls.search(basegear.category, stat)
+    if len(scroll_list) == 0:
+        ready_to_output += f"Scroll for {basegear.category} {stat} not found, please check your scroll data.\n"
+        return
+    statresult = []
+    # get 10%+30% success number
+    clear_screen()
+    print(f"Available Scrolls:\n")
+    for index, scroll in enumerate(scroll_list):
+        print(f"{index} : {scroll}")
+    print("")
+    text = input('please input the 10%+30% success number: ')
+    try:
+        text = int(text)
+    except ValueError:
+        ready_to_output += f"Input not valid, please input a number.\n"
+        return
+    statresult.append(text)
+    # get 60%+70% success number
+    clear_screen()
+    print(f"Available Scrolls:\n")
+    for index, scroll in enumerate(scroll_list):
+        print(f"{index} : {scroll}")
+    print("")
+    text = input('please input the 60%+70% success number: ')
+    try:
+        text = int(text)
+    except ValueError:
+        ready_to_output += f"Input not valid, please input a number.\n"
+        return
+    statresult.append(text)
+    # generate sequence
+    success, result = find_best_sequence(statresult, basegear, stat)
+    if not success and type(result)==str:
+        ready_to_output += result+"\n"
+        return
+    filename = output_scroll_sequence(result, basegear) # type: ignore
+    ready_to_output += f"QuickCommand:\n"
+    ready_to_output += f"{colored("bs","red")}\n"
+    ready_to_output += f"{colored(basegear.name,"red")}\n"
+    ready_to_output += f"{colored(stat,"red")}\n"
+    ready_to_output += f"{colored(statresult[0],"red")}\n"
+    ready_to_output += f"{colored(statresult[1],"red")}\n"
+    ready_to_output += f"\n"
+    ready_to_output += f"\n"
+    ready_to_output += f"-----\n"
+    ready_to_output += f"you can copy above QuickCommand (red text) to a .txt file and use QuickCommand in home page to excute it.\n"
+    ready_to_output += f"best sequence result has been output to {colored(filename,"cyan")}\n"
+    
+    
+
     

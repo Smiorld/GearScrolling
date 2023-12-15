@@ -70,8 +70,8 @@ def find_best_order(scroll_sequence: tuple[Scroll], gear: BaseGear):
                 best_sequence = tmp_scroll_sequence
                 best_gear = tmp_gear
         else:
-            return False, tmp_scroll_sequence
-    return True, (best_sequence, best_gear)
+            return False, tmp_gear
+    return True, (best_sequence , best_gear)
 
     
     
@@ -87,11 +87,11 @@ def find_best_sequence(statresult:list[int], gear: BaseGear, stat:str):
     best_gear = None
     for scroll_sequence in scroll_sequences:
         success, tmp_result = find_best_order(scroll_sequence, gear) # type: ignore
-        if success and type(tmp_result[0])==tuple[Scroll] and type(tmp_result[1])==Gear:
-            if best_gear is None or tmp_result[1].price_ev < best_gear.price_ev:
-                best_gear = tmp_result[1]
-                best_sequence = tmp_result[0]
-    return True, (best_sequence, best_gear)
+        if success:
+            if best_gear is None or  tmp_result[1].price_ev < best_gear.price_ev:   # type: ignore
+                best_gear = tmp_result[1]                                           # type: ignore
+                best_sequence = tmp_result[0]                                       # type: ignore
+    return True, best_sequence
 
 
 def generate_sequences_form_statresult(statresult:list[int], gear: BaseGear, stat:str):
