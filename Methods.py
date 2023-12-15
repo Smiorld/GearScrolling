@@ -45,7 +45,7 @@ def output_scroll_sequence(scroll_sequence: tuple[Scroll], gear: BaseGear, filen
                 price_70p = scroll_70p.price if scroll_70p is not None else 'no data'
                 writer.writerow(['scroll price', price_10p, price_30p, price_60p, price_70p])
                 writer.writerow([])
-                writer.writerow(['Slots\\columns','scrolls', 'production cost', 'pass rate', 'survival rate', 'gears usage'])
+                writer.writerow(['Slots\\columns','scrolls', 'cost EV', 'pass rate', 'survival rate', 'gears usage'])
                 tmp_gear = Gear(gear.name, gear.category, gear.clean_price, gear.tot_slots)
                 for index, scroll in enumerate(scroll_sequence):
                     one_step_scroll(scroll, tmp_gear)
@@ -73,7 +73,6 @@ def find_best_order(scroll_sequence: tuple[Scroll], gear: BaseGear):
             return False, tmp_scroll_sequence
     return True, (best_sequence, best_gear)
 
-    
     
     
 def find_best_sequence(statresult:list[int], gear: BaseGear, stat:str):

@@ -1,7 +1,7 @@
 # TODO: print some color. structure current output pannels. add more commands.
 from Classes import BaseGears, Scrolls, Gear
 from Methods import *
-import csv, os
+import csv, os, builtins
 from termcolor import colored, cprint
 
 cmd_status = 0  
@@ -9,7 +9,6 @@ ready_to_output = ''
 status_dict ={
     0: "Initial",
     1: "Home",
-    2: "Single Analyze",
 }
 
 def clear_screen():
@@ -57,17 +56,12 @@ def parse_cmd_input(input:str):
             deal_removescroll(words[1:])
         elif words[0]=='quickcommand' or words[0]=='qc':
             deal_quickcommand(words[1:])
+            return
         elif words[0]=='singleanalyse' or words[0]=='sa':
-            cmd_status = 2  
-            deal_singleanalyse_help(words[1:])
-    if cmd_status == 2:
-        if words[0]=='help' or words[0] == 'h':
-            deal_singleanalyse_help(words[1:])
-        elif words[0]=='start' or words[0]=='s':
-            deal_singleanalyse_start(words[1:])
-        elif words[0]=='home':
-            cmd_status = 1
-            deal_home_help(words[1:])
+            deal_singleanalyse()
+        elif words[0]=='bestorder' or words[0]=='bo':
+            #deal_bestorder(words[1:])
+            pass
     clear_screen()
     ready_to_output += '\n'
     ready_to_output += f"Last Command: {colored(input,"blue")}"
@@ -101,6 +95,8 @@ def deal_home_help(words:list[str]):
     ready_to_output += colored("QuickCommand ","yellow")+"filename=[filename]: load and excute commands from a file (only red command supported)\n"
     ready_to_output += "\n"
     ready_to_output += colored("SingleAnalyse ","red")+" : tool - generate analysis besed on a single scrolling sequence and gear\n"
+    ready_to_output += "\n"
+    ready_to_output += colored("BestOrder ","red")+": tool - generate the best order of the given scrolls list and gear\n"
     
 def deal_searchgear(words:list[str]):
     global cmd_status, ready_to_output, basegears
@@ -340,48 +336,8 @@ def deal_quickcommand(words:list[str]):
         ready_to_output += f"Input not valid, please make sure there is a filename.\n"
         return
     try:
-        with open(filename, 'r') as file:
-            lines = file.readlines()
-        if len(lines) == 0:
-            ready_to_output += f"Input not valid, please make sure the file '{filename}' is not empty.\n"
-            return
-        command = lines[0].strip().lower()
-        # check if command is valid. If valid, execute it.
-        if command =="singleanalyse" or command =="sa":
-            gear_name = lines[1].strip().lower()
-            if len(gear_name) == 0:
-                ready_to_output += f"QuickCommand not valid. please make sure there is gear name.\n"
-                return
-            gear = basegears.get(gear_name)
-            if gear is None:
-                ready_to_output += f"QuickCommand not valid, please make sure there is a gear named '{gear_name}'.\n"
-                return
-            stat = lines[2].strip().lower()
-            if len(stat) == 0:
-                ready_to_output += f"QuickCommand not valid. please make sure there is stat.\n"
-                return
-            scroll_sequence = []
-            for i in range(3, len(lines)):
-                try:
-                    if len(lines[i].strip()) == 0:
-                        continue
-                    success_chance = float(lines[i].strip().lower())
-                except ValueError:
-                    ready_to_output += f"QuickCommand not valid. please make sure there are valid success chance.\n"
-                    return
-                if success_chance > 1:
-                    success_chance = success_chance/100
-                scroll = scrolls.get(gear.category, stat, success_chance)
-                if scroll is None:
-                    ready_to_output += f"QuickCommand not valid, please make sure there is a scroll named '{gear.category} {stat} {success_chance}'.\n"
-                    return
-                scroll_sequence.append(scroll)
-            scroll_sequence = tuple(scroll_sequence)
-            filename = output_scroll_sequence(scroll_sequence, gear) # type: ignore
-            ready_to_output += f"QuickCommand executed successfully. Result has been output to {colored(filename,"cyan")}\n"
-        else:
-            ready_to_output += f"QuickCommand not valid, please make sure file start with a valid command.\n"
-            return
+        # replace built-in input function with custom_input function, then read commands from file as input
+        execute_with_file_input(filename)
     except FileNotFoundError:
         ready_to_output += f"Input not valid, please make sure there is a file named '{filename}'.\n"
         return
@@ -390,21 +346,40 @@ def deal_quickcommand(words:list[str]):
         return
     return
 
-# scroll analizer page commands
+def read_commands_from_file(file_path):
+    with open(file_path, 'r') as file:
+        commands = file.readlines()
+    return commands
 
-def deal_singleanalyse_help(words:list[str]):
-    global cmd_status, ready_to_output
-    ready_to_output += "Welcome to single analyse page. Here's the available commdans.\n"
-    ready_to_output += "\n"
-    ready_to_output += colored("Help ","yellow")+": show this help message\n"
-    ready_to_output += "\n"
-    ready_to_output += colored("exit ","yellow")+": exit the program\n"
-    ready_to_output += "\n"
-    ready_to_output += colored("home ","yellow")+": back to home page\n"
-    ready_to_output += "\n"
-    ready_to_output += colored("Start ","yellow")+": function entrance, start analysing.\n"
+def execute_with_file_input(commands_file_path):
+    commands = read_commands_from_file(commands_file_path)
+    input_counter = 1
+
+
+    # Replace the built-in input function with our custom_input function
+    original_input = builtins.input
     
-def deal_singleanalyse_start(words:list[str]):
+    def custom_input(prompt=None):
+        nonlocal input_counter
+        if input_counter < len(commands):
+            user_input = commands[input_counter].strip()
+            input_counter += 1
+            return user_input
+        else:
+            # If there are no more commands, fallback to actual input()
+            return original_input(prompt)
+    
+    builtins.input = custom_input
+
+    try:
+        parse_cmd_input(commands[0])
+    finally:
+        # Restore the original input function
+        builtins.input = original_input
+
+# red commands
+
+def deal_singleanalyse():
     global cmd_status, ready_to_output, scrolls, basegears
     # the process as follow:
     # 1. get gear info. use gears.get() to get the gear, if not exist, back to single analse page.
@@ -463,3 +438,5 @@ def deal_singleanalyse_start(words:list[str]):
     ready_to_output += f"you can copy above QuickCommand (red text) to a .txt file and use QuickCommand in home page to excute it.\n"
     
     ready_to_output += f"result has been output to {colored(filename,"cyan")}\n"
+    
+    
