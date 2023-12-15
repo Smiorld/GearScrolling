@@ -25,7 +25,7 @@ class Gear(BaseGear):
     
 class BaseGears:
     '''Class that represents a list of gears'''
-    file_name :str = './data/gears.json'
+    file_name :str = 'gears.json'
     
     def __init__(self):
         self.gears :list[BaseGear] = []
@@ -79,7 +79,7 @@ class BaseGears:
     def load_from_file(self):
         '''Loads the gears from the given file'''
         try:
-            with open(Scrolls.file_name, 'r') as file:
+            with open(BaseGears.file_name, 'r') as file:
                 # if no such file exists, return
                 if file == None:
                     return
@@ -91,7 +91,7 @@ class BaseGears:
         
     def save_to_file(self):
         '''Saves the gears to the given file'''
-        with open(Scrolls.file_name, 'w') as file:
+        with open(BaseGears.file_name, 'w') as file:
             data = {'gears':[]}
             for gear in self.gears:
                 data['gears'].append({'name':gear.name, 'category':gear.category, 'clean_price':gear.clean_price, 'tot_slots':gear.tot_slots})
@@ -116,7 +116,7 @@ class Scroll:
     
 class Scrolls:
     '''Class that represents a list of scrolls'''
-    file_name :str = './data/scrolls.json'
+    file_name :str = 'scrolls.json'
     
     def __init__(self):
         self.scrolls :list[Scroll] = []
@@ -268,7 +268,7 @@ class OwlrepoScroll:
 class OwlrepoScrollsCategory:
     '''Class that represents categories of all scrolls from Owlrepo'''
     scrolls :list[OwlrepoScroll] = []
-    file_name :str = './data/owlrepo_scrolls_category.json'
+    file_name :str = 'owlrepo_scrolls_category.json'
     @staticmethod
     def load_from_file( ):
         '''Loads the scrolls from the given file'''
@@ -338,7 +338,7 @@ class OwlrepoSingleSearchResult:
 class OwlrepoSearchItemIndex:
     '''Class that represents a search item index from Owlrepo'''
     results :list[OwlrepoSingleSearchResult] = []
-    file_name :str = './data/owlrepo_search_item_index.json'
+    file_name :str = 'owlrepo_search_item_index.json'
     
     @staticmethod
     def load_from_file( ):
