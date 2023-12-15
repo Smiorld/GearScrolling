@@ -19,5 +19,5 @@ It is used to calculate the best scrolling sequence to lower the gear making cos
 - [ ] update scrolls data from owlrepo
 - [x] generate output besed on a given scrolling sequence and gear
 - [x] save/load scrolling sequences to/from file (achieved by QuickCommand)
-- [ ] generate the best order for given sequence
-- [ ] generate the best ordered sequence for given expected 10%/30% success number and 60%/70% success number 
+- [x] generate the best order for given sequence
+- [x] generate the best ordered sequence for given expected 10%/30% success number and 60%/70% success number 
