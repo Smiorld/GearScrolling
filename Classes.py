@@ -53,6 +53,7 @@ class BaseGears:
         '''Updates the gear with the given name, or adds it if it doesn't exist'''
         tmp_gear = self.get(name)
         if tmp_gear != None:
+            tmp_gear.category = category
             tmp_gear.clean_price = clean_price
             tmp_gear.tot_slots = tot_slots
             self.save_to_file()
