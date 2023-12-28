@@ -236,8 +236,12 @@ class Scrolls:
     
     def remove(self, scroll: Scroll):
         '''Remove the given scroll from data'''
-        self.scrolls.remove(scroll)
+        try:
+            self.scrolls.remove(scroll)
+        except Exception:
+            return False
         self.save_to_file()
+        return True
     
     def load_from_file(self):
         '''Loads the scrolls from the given file'''

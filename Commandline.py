@@ -101,7 +101,7 @@ def deal_home_help(words:list[str]):
     ready_to_output += "\n"
     ready_to_output += colored("AddScroll ","yellow")+"category=[category] stat=[stat] success_chance=[success_chance] price=[price] (survival_chance=[survival_chance]): add or update a new scroll with the given information\n"
     ready_to_output += "\n"
-    ready_to_output += colored("RemoveScroll ","yellow")+"category=[category] stat=[stat] success_chance=[success_chance]: remove a specific scroll with the given condition\n"
+    ready_to_output += colored("RemoveScroll ","yellow")+"category=[category] stat=[stat] (success_chance=[success_chance]): remove a specific scroll with the given condition\n"
     ready_to_output += "\n"
     ready_to_output += colored("UpdateOwlrepo","yellow")+": update the saved owlrepo seached results from internet.\n"
     
@@ -212,6 +212,12 @@ def deal_searchscroll(words:list[str]):
             scroll['category'] = words[0]
         if 1<len(words):
             scroll['stat'] = words[1]
+        if 2<len(words):
+            tmp_success_chance = float(words[2])
+            if tmp_success_chance <= 1:
+                scroll['success_chance'] = tmp_success_chance
+            else:
+                scroll['success_chance'] = tmp_success_chance/100
     search_result = scrolls.search(scroll['category'], scroll['stat'], scroll['success_chance'])
     # here's a thing, limited by screen size, if more than 10 results, output to csv file
     if len(search_result)>10:
